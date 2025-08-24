@@ -12,11 +12,11 @@ This specification defines the architecture, UI components, and developer API fo
 
 2. Dialog Types  
    - **Text Input** with display of a default value.  
-   - **Multiple Selection** (Multi-Select) with display of current defaults.  
+   - **Single Selection** with display of current default.  
    - Cancel and Confirm in every dialog.
 
 3. Extensibility  
-   - Support for manual input also in multiple selection dialog.  
+   - Support for manual input also in single selection dialog.  
    - Optionally later additional dialog types (password, file selection etc.).
 
 ---
@@ -36,11 +36,11 @@ Every dialog inherits standard elements:
 - Validation (optional, e.g. regex, length)  
 - UX: Focus on text field, Enter=Confirm, Esc=Cancel
 
-### 2.3 Multi-Select Dialog (`SelectDialog`)
-Recommendation: Scrollable list with checkboxes  
-- List of all `Choices` with checkboxes  
+### 2.3 Single-Select Dialog (`SelectDialog`)
+Recommendation: Scrollable list with clickable items  
+- List of all `Choices` with clickable selection buttons  
 - "Other..." input field as last line when `AllowCustomEntry=true`  
-- Pre-selected defaults as active checkboxes  
+- Pre-selected default as highlighted selection  
 - UX: Scrollbar for many entries, buttons as usual
 
 ---
@@ -62,18 +62,18 @@ func PromptInput(opts InputDialogOptions) (result string, canceled bool, err err
 ```
 
 ```go
-// Options for multi-select dialog
+// Options for single-select dialog
 type SelectDialogOptions struct {
-    Title             string
-    Label             string
-    Description       string
-    Choices           []string
-    DefaultSelections []string
-    AllowCustomEntry  bool
+    Title            string
+    Label            string
+    Description      string
+    Choices          []string
+    DefaultSelection string
+    AllowCustomEntry bool
 }
 
-// Call: shows multi-select dialog
-func PromptSelect(opts SelectDialogOptions) (selected []string, canceled bool, err error)
+// Call: shows single-select dialog
+func PromptSelect(opts SelectDialogOptions) (selected string, canceled bool, err error)
 ```
 
 ### 3.1 Optional: Builder Pattern
@@ -99,9 +99,9 @@ res, canceled, err := NewInputDialog().
 
 ## 5. UX Notes & Recommendations
 
-- Clear self-explanatory multi-select lists with checkboxes.  
+- Clear self-explanatory single-select lists with clickable buttons.  
 - "Other..." field only visible when needed.  
-- Highlight defaults slightly (e.g. background color).
+- Highlight selected item clearly (e.g. background color contrast).
 
 ---
 
@@ -118,15 +118,15 @@ val, canceled, err := PromptInput(InputDialogOptions{
 })
 ```
 
-### 6.2 Multiple Selection with Custom Entry
+### 6.2 Single Selection with Custom Entry
 
 ```go
 chosen, canceled, err := PromptSelect(SelectDialogOptions{
-    Title:             "Choose Languages",
-    Label:             "Select languages to install",
-    Choices:           []string{"Go", "Rust", "Python", "Java"},
-    DefaultSelections: []string{"Go", "Python"},
-    AllowCustomEntry:  true,
+    Title:            "Choose Language",
+    Label:            "Select language to install",
+    Choices:          []string{"Go", "Rust", "Python", "Java"},
+    DefaultSelection: "Go",
+    AllowCustomEntry: true,
 })
 ```
 

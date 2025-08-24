@@ -20,20 +20,20 @@ func PromptInput(opts InputDialogOptions) (result string, canceled bool, err err
 	return dlg.Show()
 }
 
-// SelectDialogOptions holds the configuration for a multiple-selection dialog.
+// SelectDialogOptions holds the configuration for a single-selection dialog.
 type SelectDialogOptions struct {
-	Title             string   // Window title
-	Label             string   // Prompt label
-	Description       string   // Additional description or help text
-	Choices           []string // Available options to select from
-	DefaultSelections []string // Options pre-selected when the dialog opens
-	AllowCustomEntry  bool     // If true, allows the user to enter a custom value
+	Title            string   // Window title
+	Label            string   // Prompt label
+	Description      string   // Additional description or help text
+	Choices          []string // Available options to select from
+	DefaultSelection string   // Option pre-selected when the dialog opens
+	AllowCustomEntry bool     // If true, allows the user to enter a custom value
 }
 
-// PromptSelect displays a multi-select dialog according to the provided options.
-// It returns the selected items, a flag indicating whether the dialog was canceled, and any error.
-func PromptSelect(opts SelectDialogOptions) (selected []string, canceled bool, err error) {
-	dlg := internaldialog.NewSelectDialog(opts.Title, opts.Label, opts.Description, opts.Choices, opts.DefaultSelections, opts.AllowCustomEntry)
+// PromptSelect displays a single-select dialog according to the provided options.
+// It returns the selected item, a flag indicating whether the dialog was canceled, and any error.
+func PromptSelect(opts SelectDialogOptions) (selected string, canceled bool, err error) {
+	dlg := internaldialog.NewSelectDialog(opts.Title, opts.Label, opts.Description, opts.Choices, opts.DefaultSelection, opts.AllowCustomEntry)
 	return dlg.Show()
 }
 

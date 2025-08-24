@@ -13,48 +13,48 @@ import (
 	"gioui.org/widget/material"
 )
 
-// selectDialog is the internal implementation stub for a multi-select dialog.
+// selectDialog is the internal implementation stub for a single-select dialog.
 type selectDialog struct {
-	Title             string
-	Label             string
-	Description       string
-	Choices           []string
-	DefaultSelections []string
-	AllowCustomEntry  bool
+	Title            string
+	Label            string
+	Description      string
+	Choices          []string
+	DefaultSelection string
+	AllowCustomEntry bool
 
 	// internal result state
-	selected []string
+	selected string
 	canceled bool
 
 	// UI state
-	checkboxes   []widget.Bool
-	customInput  widget.Editor
-	okButton     widget.Clickable
-	cancelButton widget.Clickable
-	done         bool
+	selectedIndex int
+	choiceButtons []widget.Clickable
+	customInput   widget.Editor
+	okButton      widget.Clickable
+	cancelButton  widget.Clickable
+	done          bool
 }
 
 // NewSelectDialog initializes a selectDialog from provided parameters.
-func NewSelectDialog(title, label, description string, choices, defaultSelections []string, allowCustomEntry bool) *selectDialog {
+func NewSelectDialog(title, label, description string, choices []string, defaultSelection string, allowCustomEntry bool) *selectDialog {
 	d := &selectDialog{
-		Title:             title,
-		Label:             label,
-		Description:       description,
-		Choices:           choices,
-		DefaultSelections: defaultSelections,
-		AllowCustomEntry:  allowCustomEntry,
+		Title:            title,
+		Label:            label,
+		Description:      description,
+		Choices:          choices,
+		DefaultSelection: defaultSelection,
+		AllowCustomEntry: allowCustomEntry,
+		selectedIndex:    -1, // No selection initially
 	}
 
-	// Initialize checkboxes for each choice
-	d.checkboxes = make([]widget.Bool, len(choices))
+	// Initialize clickable buttons for each choice
+	d.choiceButtons = make([]widget.Clickable, len(choices))
 
-	// Set default selections
+	// Set default selection
 	for i, choice := range choices {
-		for _, defaultSel := range defaultSelections {
-			if choice == defaultSel {
-				d.checkboxes[i].Value = true
-				break
-			}
+		if choice == defaultSelection {
+			d.selectedIndex = i
+			break
 		}
 	}
 
@@ -66,9 +66,9 @@ func NewSelectDialog(title, label, description string, choices, defaultSelection
 	return d
 }
 
-// Show runs the multiple-selection dialog event loop and returns the selected
-// items, a canceled flag, and an error if something went wrong.
-func (d *selectDialog) Show() ([]string, bool, error) {
+// Show runs the single-selection dialog event loop and returns the selected
+// item, a canceled flag, and an error if something went wrong.
+func (d *selectDialog) Show() (string, bool, error) {
 	w := app.Window{}
 	w.Option(
 		app.Title(d.Title),
@@ -173,12 +173,29 @@ func (d *selectDialog) choiceItems(gtx layout.Context, th *material.Theme) []lay
 	for i, choice := range d.Choices {
 		i, choice := i, choice // capture loop variables
 		items = append(items, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
-				layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-					checkbox := material.CheckBox(th, &d.checkboxes[i], choice)
-					return checkbox.Layout(gtx)
-				}),
-			)
+			// Check if this item was clicked
+			if d.choiceButtons[i].Clicked(gtx) {
+				d.selectedIndex = i
+			}
+
+			// Create button style with enhanced selection indicator
+			var buttonText string
+			btn := material.Button(th, &d.choiceButtons[i], "")
+
+			if d.selectedIndex == i {
+				// Selected item: use high contrast colors and add checkmark
+				btn.Background = th.Palette.ContrastBg
+				btn.Color = th.Palette.ContrastFg
+				buttonText = "✓ " + choice
+			} else {
+				// Unselected item: use subtle styling
+				btn.Background = th.Bg
+				btn.Color = th.Fg
+				buttonText = "  " + choice
+			}
+
+			btn.Text = buttonText
+			return btn.Layout(gtx)
 		}))
 	}
 
@@ -186,28 +203,27 @@ func (d *selectDialog) choiceItems(gtx layout.Context, th *material.Theme) []lay
 }
 
 func (d *selectDialog) handleOK() {
-	var selected []string
-
-	// Collect selected choices
-	for i, checkbox := range d.checkboxes {
-		if checkbox.Value {
-			selected = append(selected, d.Choices[i])
-		}
-	}
-
-	// Add custom entry if provided
+	// Check if custom entry is provided and not empty
 	if d.AllowCustomEntry {
 		customText := d.customInput.Text()
 		if customText != "" {
-			selected = append(selected, customText)
+			d.selected = customText
+			d.canceled = false
+			d.done = true
+			return
 		}
 	}
 
-	d.selected = selected
+	// Use selected choice if any
+	if d.selectedIndex >= 0 && d.selectedIndex < len(d.Choices) {
+		d.selected = d.Choices[d.selectedIndex]
+	} else {
+		d.selected = ""
+	}
 	d.canceled = false
 }
 
 func (d *selectDialog) handleCancel() {
-	d.selected = nil
+	d.selected = ""
 	d.canceled = true
 }

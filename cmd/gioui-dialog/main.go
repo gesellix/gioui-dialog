@@ -70,12 +70,13 @@ func eventLoop(w *app.Window) error {
 
 			if selectBtn.Clicked(gtx) {
 				go func() {
-					choices, canceled, err := dialog.PromptSelect(dialog.SelectDialogOptions{
-						Title:             "Multiple Selection",
-						Label:             "Choose options",
-						Choices:           []string{"Option A", "Option B", "Option C"},
-						DefaultSelections: []string{"Option B"},
-						AllowCustomEntry:  true,
+					choice, canceled, err := dialog.PromptSelect(dialog.SelectDialogOptions{
+						Title:            "Single Selection",
+						Label:            "Choose an option",
+						Description:      "Select one item from the list or enter a custom value",
+						Choices:          []string{"Option A", "Option B", "Option C"},
+						DefaultSelection: "Option B",
+						AllowCustomEntry: true,
 					})
 					if err != nil {
 						log.Println("Error showing select dialog:", err)
@@ -83,7 +84,7 @@ func eventLoop(w *app.Window) error {
 					} else if canceled {
 						resultText = "Canceled"
 					} else {
-						resultText = fmt.Sprintf("Selection: %v", choices)
+						resultText = fmt.Sprintf("Selection: %q", choice)
 					}
 				}()
 			}

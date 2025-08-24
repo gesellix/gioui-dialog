@@ -6,7 +6,7 @@ A cross-platform dialog library for [Gio](https://gioui.org/) applications, prov
 
 - **Cross-Platform**: Works on Windows, macOS, and Linux
 - **Native Gio Integration**: Built specifically for Gio applications
-- **Multiple Dialog Types**: Text input, multi-select, and base dialogs
+- **Multiple Dialog Types**: Text input, single-select, and base dialogs
 - **Keyboard Shortcuts**: Support for Enter (confirm) and Escape (cancel)
 - **Validation Support**: Optional input validation for text dialogs
 - **Custom Entries**: Allow custom input in selection dialogs
@@ -68,18 +68,18 @@ result, canceled, err := dialog.PromptInput(dialog.InputDialogOptions{
 })
 ```
 
-### Multi-Select Dialog
+### Single-Select Dialog
 
-Allows users to select multiple options from a list, with optional custom entry.
+Allows users to select one option from a list, with optional custom entry.
 
 ```go
 selected, canceled, err := dialog.PromptSelect(dialog.SelectDialogOptions{
-    Title:             "Choose Languages",
-    Label:             "Select programming languages",
-    Description:       "Choose your favorite languages to install",
-    Choices:           []string{"Go", "Rust", "Python", "Java", "JavaScript"},
-    DefaultSelections: []string{"Go", "Python"},
-    AllowCustomEntry:  true,
+    Title:            "Choose Language",
+    Label:            "Select programming language",
+    Description:      "Choose your favorite language to install",
+    Choices:          []string{"Go", "Rust", "Python", "Java", "JavaScript"},
+    DefaultSelection: "Go",
+    AllowCustomEntry: true,
 })
 ```
 
@@ -115,7 +115,7 @@ confirmed, canceled, err := dialog.PromptBase(dialog.BaseDialogOptions{
 | `Label` | `string` | Main prompt text |
 | `Description` | `string` | Additional help text (optional) |
 | `Choices` | `[]string` | Available options to select from |
-| `DefaultSelections` | `[]string` | Pre-selected options |
+| `DefaultSelection` | `string` | Pre-selected option |
 | `AllowCustomEntry` | `bool` | Allow user to enter custom values |
 
 ### BaseDialogOptions
@@ -160,7 +160,7 @@ go build ./cmd/gioui-dialog
 ├── internal/dialog/            # Internal implementations
 │   ├── base.go                 # Base dialog
 │   ├── input.go               # Text input dialog
-│   └── select.go              # Multi-select dialog
+│   └── select.go              # Single-select dialog
 ├── SPEC.md                    # Technical specification
 ├── README.md                  # This file
 ├── LICENSE                    # MIT License
