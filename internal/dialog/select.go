@@ -3,11 +3,16 @@
 package dialog
 
 import (
+	"image"
+	"image/color"
+
 	"gioui.org/app"
 	"gioui.org/io/key"
 	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
+	"gioui.org/op/clip"
+	"gioui.org/op/paint"
 	"gioui.org/unit"
 	"gioui.org/widget"
 	"gioui.org/widget/material"
@@ -64,6 +69,68 @@ func NewSelectDialog(title, label, description string, choices []string, default
 	}
 
 	return d
+}
+
+// styledEditor creates an editor with border styling inspired by cu theme
+func (d *selectDialog) styledEditor(gtx layout.Context, th *material.Theme) layout.Dimensions {
+	cornerRadius := unit.Dp(4)
+	inset := unit.Dp(4)
+
+	return layout.Stack{Alignment: layout.W}.Layout(gtx,
+		// Draw the background and border
+		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
+			rect := image.Rectangle{Max: gtx.Constraints.Min}
+			inner := rect.Inset(gtx.Dp(inset))
+
+			// Colors inspired by cu theme
+			backgroundColor := color.NRGBA{R: 255, G: 255, B: 255, A: 255}
+			borderColor := color.NRGBA{R: 200, G: 200, B: 200, A: 255}
+			focusColor := color.NRGBA{R: 0, G: 123, B: 255, A: 255}
+
+			rr := gtx.Dp(cornerRadius)
+
+			// Draw focus border if focused
+			if gtx.Focused(&d.customInput) {
+				w := gtx.Dp(2)
+				paint.FillShape(gtx.Ops, focusColor,
+					clip.Stroke{
+						Path:  clip.UniformRRect(rect.Inset(w), rr+w).Path(gtx.Ops),
+						Width: float32(w),
+					}.Op(),
+				)
+			}
+
+			// Draw background
+			shape := clip.UniformRRect(inner, rr)
+			defer shape.Push(gtx.Ops).Pop()
+			paint.Fill(gtx.Ops, backgroundColor)
+
+			// Draw border
+			w := gtx.Dp(1)
+			paint.FillShape(gtx.Ops, borderColor,
+				clip.Stroke{
+					Path:  clip.UniformRRect(inner, rr).Path(gtx.Ops),
+					Width: float32(w),
+				}.Op(),
+			)
+
+			return layout.Dimensions{Size: gtx.Constraints.Min}
+		}),
+
+		// Draw the text editor on top
+		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
+			return layout.Inset{
+				Top:    8,
+				Bottom: 8,
+				Left:   12,
+				Right:  12,
+			}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				editor := material.Editor(th, &d.customInput, "")
+				editor.TextSize = unit.Sp(14)
+				return editor.Layout(gtx)
+			})
+		}),
+	)
 }
 
 // Show runs the single-selection dialog event loop and returns the selected
@@ -141,9 +208,7 @@ func (d *selectDialog) layout(gtx layout.Context, th *material.Theme) layout.Dim
 						return label.Layout(gtx)
 					}),
 					layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-						editor := material.Editor(th, &d.customInput, "")
-						editor.TextSize = unit.Sp(14)
-						return editor.Layout(gtx)
+						return d.styledEditor(gtx, th)
 					}),
 				)
 			}),
