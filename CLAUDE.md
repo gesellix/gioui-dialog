@@ -18,7 +18,7 @@ The gioui-dialog library was developed with significant assistance from Claude A
 - **Dialog Implementations**: 
   - BaseDialog: Simple confirmation dialog with OK/Cancel functionality
   - InputDialog: Text input with validation support and keyboard shortcuts
-  - SelectDialog: Multi-select with checkboxes and optional custom entry
+  - SelectDialog: Single-select with clickable buttons, scrollable lists, and optional custom entry
 - **Event Loop Management**: Implemented proper window event handling and lifecycle management
 - **UI Layout**: Created responsive layouts using Gio's layout system
 
@@ -74,7 +74,7 @@ The project followed an iterative development approach:
 - `pkg/dialog/dialog.go` - Public API definitions
 - `internal/dialog/base.go` - Base dialog implementation
 - `internal/dialog/input.go` - Text input dialog implementation  
-- `internal/dialog/select.go` - Multi-select dialog implementation
+- `internal/dialog/select.go` - Single-select dialog implementation
 - `cmd/gioui-dialog/main.go` - Demo application
 - `README.md` - Project documentation
 - `SPEC.md` - Technical specification (translated and updated)

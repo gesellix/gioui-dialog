@@ -7,6 +7,8 @@ A cross-platform dialog library for [Gio](https://gioui.org/) applications, prov
 - **Cross-Platform**: Works on Windows, macOS, and Linux
 - **Native Gio Integration**: Built specifically for Gio applications
 - **Multiple Dialog Types**: Text input, single-select, and base dialogs
+- **Scrollable Lists**: Selection dialogs support scrolling for large option lists
+- **Styled Input Fields**: Professional-looking input fields with borders and focus highlighting
 - **Keyboard Shortcuts**: Support for Enter (confirm) and Escape (cancel)
 - **Validation Support**: Optional input validation for text dialogs
 - **Custom Entries**: Allow custom input in selection dialogs
