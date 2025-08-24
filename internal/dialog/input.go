@@ -57,6 +57,14 @@ func (d *inputDialog) styledEditor(gtx layout.Context, th *material.Theme) layou
 	cornerRadius := unit.Dp(4)
 	inset := unit.Dp(4)
 
+	// Set minimum size for input field
+	minWidth := unit.Dp(200)
+	minHeight := unit.Dp(32)
+
+	// Apply minimum constraints
+	gtx.Constraints.Min.X = max(gtx.Constraints.Min.X, gtx.Dp(minWidth))
+	gtx.Constraints.Min.Y = max(gtx.Constraints.Min.Y, gtx.Dp(minHeight))
+
 	return layout.Stack{Alignment: layout.W}.Layout(gtx,
 		// Draw the background and border
 		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
@@ -100,6 +108,10 @@ func (d *inputDialog) styledEditor(gtx layout.Context, th *material.Theme) layou
 
 		// Draw the text editor on top
 		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
+			// Apply minimum constraints to the editor
+			gtx.Constraints.Min.X = gtx.Dp(minWidth)
+			gtx.Constraints.Min.Y = gtx.Dp(minHeight)
+
 			return layout.Inset{
 				Top:    8,
 				Bottom: 8,
