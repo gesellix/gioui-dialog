@@ -73,8 +73,8 @@ func eventLoop(w *app.Window) error {
 					choice, canceled, err := dialog.PromptSelect(dialog.SelectDialogOptions{
 						Title:            "Single Selection",
 						Label:            "Choose an option",
-						Description:      "Select one item from the list or enter a custom value",
-						Choices:          []string{"Option A", "Option B", "Option C"},
+						Description:      "Select one item from the list or enter a custom value (scroll to see more)",
+						Choices:          []string{"Option A", "Option B", "Option C", "Option D", "Option E", "Option F", "Option G", "Option H"},
 						DefaultSelection: "Option B",
 						AllowCustomEntry: true,
 					})

@@ -37,6 +37,7 @@ type selectDialog struct {
 	customInput   widget.Editor
 	okButton      widget.Clickable
 	cancelButton  widget.Clickable
+	list          layout.List
 	done          bool
 }
 
@@ -67,6 +68,9 @@ func NewSelectDialog(title, label, description string, choices []string, default
 	if allowCustomEntry {
 		d.customInput.SingleLine = true
 	}
+
+	// Initialize scrollable list
+	d.list.Axis = layout.Vertical
 
 	return d
 }
@@ -203,11 +207,15 @@ func (d *selectDialog) layout(gtx layout.Context, th *material.Theme) layout.Dim
 				desc.Color = th.Fg
 				return desc.Layout(gtx)
 			}),
-			// Choices with checkboxes
-			layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-				return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
-					d.choiceItems(gtx, th)...,
-				)
+			// Choices with scrollable list
+			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+				// Set height to show approximately 3 items (button height ~40dp + spacing)
+				maxHeight := unit.Dp(140)
+				gtx.Constraints.Max.Y = gtx.Dp(maxHeight)
+
+				return d.list.Layout(gtx, len(d.Choices), func(gtx layout.Context, i int) layout.Dimensions {
+					return d.choiceItem(gtx, th, i)
+				})
 			}),
 			// Custom entry if allowed
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
@@ -244,39 +252,32 @@ func (d *selectDialog) layout(gtx layout.Context, th *material.Theme) layout.Dim
 	})
 }
 
-func (d *selectDialog) choiceItems(gtx layout.Context, th *material.Theme) []layout.FlexChild {
-	var items []layout.FlexChild
+func (d *selectDialog) choiceItem(gtx layout.Context, th *material.Theme, i int) layout.Dimensions {
+	choice := d.Choices[i]
 
-	for i, choice := range d.Choices {
-		i, choice := i, choice // capture loop variables
-		items = append(items, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
-			// Check if this item was clicked
-			if d.choiceButtons[i].Clicked(gtx) {
-				d.selectedIndex = i
-			}
-
-			// Create button style with enhanced selection indicator
-			var buttonText string
-			btn := material.Button(th, &d.choiceButtons[i], "")
-
-			if d.selectedIndex == i {
-				// Selected item: use high contrast colors and add checkmark
-				btn.Background = th.Palette.ContrastBg
-				btn.Color = th.Palette.ContrastFg
-				buttonText = "✓ " + choice
-			} else {
-				// Unselected item: use subtle styling
-				btn.Background = th.Bg
-				btn.Color = th.Fg
-				buttonText = "  " + choice
-			}
-
-			btn.Text = buttonText
-			return btn.Layout(gtx)
-		}))
+	// Check if this item was clicked
+	if d.choiceButtons[i].Clicked(gtx) {
+		d.selectedIndex = i
 	}
 
-	return items
+	// Create button style with enhanced selection indicator
+	var buttonText string
+	btn := material.Button(th, &d.choiceButtons[i], "")
+
+	if d.selectedIndex == i {
+		// Selected item: use high contrast colors and add checkmark
+		btn.Background = th.Palette.ContrastBg
+		btn.Color = th.Palette.ContrastFg
+		buttonText = "✓ " + choice
+	} else {
+		// Unselected item: use subtle styling
+		btn.Background = th.Bg
+		btn.Color = th.Fg
+		buttonText = "  " + choice
+	}
+
+	btn.Text = buttonText
+	return btn.Layout(gtx)
 }
 
 func (d *selectDialog) handleOK() {
@@ -286,7 +287,6 @@ func (d *selectDialog) handleOK() {
 		if customText != "" {
 			d.selected = customText
 			d.canceled = false
-			d.done = true
 			return
 		}
 	}
