@@ -18,9 +18,10 @@ import (
 // According to SPEC.md it provides Title, Label, Description and
 // standard OK/Cancel handling.
 type BaseDialog struct {
-	Title       string
-	Label       string
-	Description string
+	Width, Height float32
+	Title         string
+	Label         string
+	Description   string
 
 	// internal result state
 	confirmed bool
@@ -33,8 +34,14 @@ type BaseDialog struct {
 }
 
 // NewBaseDialog creates a new BaseDialog with the standard fields.
-func NewBaseDialog(title, label, description string) *BaseDialog {
-	return &BaseDialog{Title: title, Label: label, Description: description}
+func NewBaseDialog(width, height float32, title, label, description string) *BaseDialog {
+	if width <= 0 {
+		width = 400
+	}
+	if height <= 0 {
+		height = 180
+	}
+	return &BaseDialog{Width: width, Height: height, Title: title, Label: label, Description: description}
 }
 
 // Show runs the base dialog event loop and returns whether the dialog was
@@ -43,7 +50,7 @@ func (b *BaseDialog) Show() (confirmed bool, canceled bool, err error) {
 	w := app.Window{}
 	w.Option(
 		app.Title(b.Title),
-		app.Size(unit.Dp(400), unit.Dp(180)),
+		app.Size(unit.Dp(b.Width), unit.Dp(b.Height)),
 	)
 
 	th := material.NewTheme()
