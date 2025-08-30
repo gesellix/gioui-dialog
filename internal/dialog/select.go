@@ -5,6 +5,7 @@ package dialog
 import (
 	"image"
 	"image/color"
+	"time"
 
 	"gioui.org/app"
 	"gioui.org/io/key"
@@ -20,6 +21,7 @@ import (
 
 // selectDialog is the internal implementation stub for a single-select dialog.
 type selectDialog struct {
+	Width, Height    float32
 	Title            string
 	Label            string
 	Description      string
@@ -42,8 +44,16 @@ type selectDialog struct {
 }
 
 // NewSelectDialog initializes a selectDialog from provided parameters.
-func NewSelectDialog(title, label, description string, choices []string, defaultSelection string, allowCustomEntry bool) *selectDialog {
+func NewSelectDialog(width, height float32, title, label, description string, choices []string, defaultSelection string, allowCustomEntry bool) *selectDialog {
+	if width <= 0 {
+		width = 400
+	}
+	if height <= 0 {
+		height = 300
+	}
 	d := &selectDialog{
+		Width:            width,
+		Height:           height,
 		Title:            title,
 		Label:            label,
 		Description:      description,
@@ -155,8 +165,13 @@ func (d *selectDialog) Show() (string, bool, error) {
 	w := app.Window{}
 	w.Option(
 		app.Title(d.Title),
-		app.Size(unit.Dp(400), unit.Dp(300)),
+		app.Size(unit.Dp(d.Width), unit.Dp(d.Height)),
 	)
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w.Perform(system.ActionCenter)
+	}()
+	w.Perform(system.ActionCenter)
 
 	th := material.NewTheme()
 	var ops op.Ops

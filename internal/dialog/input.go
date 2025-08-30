@@ -5,6 +5,7 @@ package dialog
 import (
 	"image"
 	"image/color"
+	"time"
 
 	"gioui.org/app"
 	"gioui.org/io/key"
@@ -20,11 +21,12 @@ import (
 
 // inputDialog is the internal implementation stub for a text-input dialog.
 type inputDialog struct {
-	Title       string
-	Label       string
-	Description string
-	DefaultText string
-	Validate    func(string) error
+	Width, Height float32
+	Title         string
+	Label         string
+	Description   string
+	DefaultText   string
+	Validate      func(string) error
 
 	// internal result state
 	result   string
@@ -38,8 +40,16 @@ type inputDialog struct {
 }
 
 // NewInputDialog initializes an inputDialog from provided parameters.
-func NewInputDialog(title, label, description, defaultText string, validate func(string) error) *inputDialog {
+func NewInputDialog(width, height float32, title, label, description, defaultText string, validate func(string) error) *inputDialog {
+	if width <= 0 {
+		width = 400
+	}
+	if height <= 0 {
+		height = 200
+	}
 	d := &inputDialog{
+		Width:       width,
+		Height:      height,
 		Title:       title,
 		Label:       label,
 		Description: description,
@@ -132,8 +142,13 @@ func (d *inputDialog) Show() (string, bool, error) {
 	w := app.Window{}
 	w.Option(
 		app.Title(d.Title),
-		app.Size(unit.Dp(400), unit.Dp(200)),
+		app.Size(unit.Dp(d.Width), unit.Dp(d.Height)),
 	)
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w.Perform(system.ActionCenter)
+	}()
+	w.Perform(system.ActionCenter)
 
 	th := material.NewTheme()
 	var ops op.Ops
