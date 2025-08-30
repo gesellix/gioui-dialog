@@ -5,6 +5,7 @@ package dialog
 import (
 	"image"
 	"image/color"
+	"time"
 
 	"gioui.org/app"
 	"gioui.org/io/key"
@@ -143,6 +144,11 @@ func (d *inputDialog) Show() (string, bool, error) {
 		app.Title(d.Title),
 		app.Size(unit.Dp(d.Width), unit.Dp(d.Height)),
 	)
+	go func() {
+		time.Sleep(10 * time.Millisecond)
+		w.Perform(system.ActionCenter)
+	}()
+	w.Perform(system.ActionCenter)
 
 	th := material.NewTheme()
 	var ops op.Ops
