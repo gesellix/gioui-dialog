@@ -1,5 +1,3 @@
-// gioui-dialog/internal/dialog/base.go
-
 package dialog
 
 import (
@@ -43,7 +41,13 @@ func NewBaseDialog(width, height float32, title, label, description string) *Bas
 	if height <= 0 {
 		height = 180
 	}
-	return &BaseDialog{Width: width, Height: height, Title: title, Label: label, Description: description}
+	return &BaseDialog{
+		Width:       width,
+		Height:      height,
+		Title:       title,
+		Label:       label,
+		Description: description,
+	}
 }
 
 // Show runs the base dialog event loop and returns whether the dialog was

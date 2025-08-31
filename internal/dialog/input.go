@@ -1,5 +1,3 @@
-// gioui-dialog/internal/dialog/input.go
-
 package dialog
 
 import (

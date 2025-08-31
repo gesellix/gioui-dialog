@@ -1,5 +1,3 @@
-// gioui-dialog/internal/dialog/select.go
-
 package dialog
 
 import (
