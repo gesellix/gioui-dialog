@@ -38,7 +38,7 @@ type selectDialog struct {
 	customInput   widget.Editor
 	okButton      widget.Clickable
 	cancelButton  widget.Clickable
-	list          layout.List
+	list          widget.List
 	done          bool
 }
 
@@ -208,6 +208,8 @@ func (d *selectDialog) Show() (string, bool, error) {
 }
 
 func (d *selectDialog) layout(gtx layout.Context, th *material.Theme) layout.Dimensions {
+	materialList := material.List(th, &d.list)
+	materialList.AnchorStrategy = material.Occupy
 	return layout.UniformInset(unit.Dp(20)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Vertical, Spacing: layout.SpaceAround}.Layout(gtx,
 			// Label
@@ -230,7 +232,7 @@ func (d *selectDialog) layout(gtx layout.Context, th *material.Theme) layout.Dim
 				maxHeight := unit.Dp(140)
 				gtx.Constraints.Max.Y = gtx.Dp(maxHeight)
 
-				return d.list.Layout(gtx, len(d.Choices), func(gtx layout.Context, i int) layout.Dimensions {
+				return materialList.Layout(gtx, len(d.Choices), func(gtx layout.Context, i int) layout.Dimensions {
 					return d.choiceItem(gtx, th, i)
 				})
 			}),
