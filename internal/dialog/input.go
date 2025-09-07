@@ -143,10 +143,10 @@ func (d *inputDialog) Show() (string, bool, error) {
 		app.Size(unit.Dp(d.Width), unit.Dp(d.Height)),
 	)
 	go func() {
-		time.Sleep(10 * time.Millisecond)
-		w.Perform(system.ActionCenter)
+		time.Sleep(50 * time.Millisecond)
+		w.Perform(system.ActionCenter | system.ActionRaise)
 	}()
-	w.Perform(system.ActionCenter)
+	w.Perform(system.ActionCenter | system.ActionRaise)
 
 	th := material.NewTheme()
 	var ops op.Ops
