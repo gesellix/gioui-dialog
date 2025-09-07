@@ -59,10 +59,10 @@ func (b *BaseDialog) Show() (confirmed bool, canceled bool, err error) {
 		app.Size(unit.Dp(b.Width), unit.Dp(b.Height)),
 	)
 	go func() {
-		time.Sleep(10 * time.Millisecond)
-		w.Perform(system.ActionCenter)
+		time.Sleep(50 * time.Millisecond)
+		w.Perform(system.ActionCenter | system.ActionRaise)
 	}()
-	w.Perform(system.ActionCenter)
+	w.Perform(system.ActionCenter | system.ActionRaise)
 
 	th := material.NewTheme()
 	var ops op.Ops
