@@ -41,7 +41,7 @@ Recommendation: Scrollable list with clickable items
 - List of all `Choices` with clickable selection buttons  
 - "Other..." input field as last line when `AllowCustomEntry=true`  
 - Pre-selected default as highlighted selection  
-- UX: Scrollbar for many entries, buttons as usual
+- UX: Scrollbar automatically shown for many entries (displays ~3 items at once), buttons as usual
 
 ---
 
@@ -50,11 +50,12 @@ Recommendation: Scrollable list with clickable items
 ```go
 // Options for text input dialog
 type InputDialogOptions struct {
-    Title       string
-    Label       string
-    Description string
-    DefaultText string
-    Validate    func(string) error // optional
+    Width, Height float32            // Dimensions of the dialog window
+    Title         string             // Window title
+    Label         string             // Prompt label
+    Description   string             // Additional description or help text
+    DefaultText   string             // Initial text shown in the input field
+    Validate      func(string) error // Optional validation function; return an error on invalid input
 }
 
 // Call: shows text input dialog
@@ -64,16 +65,30 @@ func PromptInput(opts InputDialogOptions) (result string, canceled bool, err err
 ```go
 // Options for single-select dialog
 type SelectDialogOptions struct {
-    Title            string
-    Label            string
-    Description      string
-    Choices          []string
-    DefaultSelection string
-    AllowCustomEntry bool
+    Width, Height    float32  // Dimensions of the dialog window
+    Title            string   // Window title
+    Label            string   // Prompt label
+    Description      string   // Additional description or help text
+    Choices          []string // Available options to select from
+    DefaultSelection string   // Option pre-selected when the dialog opens
+    AllowCustomEntry bool     // If true, allows the user to enter a custom value
 }
 
 // Call: shows single-select dialog
 func PromptSelect(opts SelectDialogOptions) (selected string, canceled bool, err error)
+```
+
+```go
+// Options for base dialog
+type BaseDialogOptions struct {
+    Width, Height float32 // Dimensions of the dialog window
+    Title         string  // Window title
+    Label         string  // Prompt label
+    Description   string  // Additional description or help text
+}
+
+// Call: shows base dialog
+func PromptBase(opts BaseDialogOptions) (confirmed bool, canceled bool, err error)
 ```
 
 ### 3.1 Optional: Builder Pattern
@@ -111,6 +126,8 @@ res, canceled, err := NewInputDialog().
 
 ```go
 val, canceled, err := PromptInput(InputDialogOptions{
+    Width:       400,
+    Height:      200,
     Title:       "API Key",
     Label:       "Enter your API key",
     Description: "Will be stored on the server.",
@@ -122,6 +139,8 @@ val, canceled, err := PromptInput(InputDialogOptions{
 
 ```go
 chosen, canceled, err := PromptSelect(SelectDialogOptions{
+    Width:            450,
+    Height:           300,
     Title:            "Choose Language",
     Label:            "Select language to install",
     Choices:          []string{"Go", "Rust", "Python", "Java"},
