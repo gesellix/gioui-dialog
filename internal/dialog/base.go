@@ -1,6 +1,9 @@
 package dialog
 
 import (
+	"sync"
+	"time"
+
 	"gioui.org/app"
 	"gioui.org/io/key"
 	"gioui.org/io/system"
@@ -56,6 +59,13 @@ func (b *BaseDialog) Show() (confirmed bool, canceled bool, err error) {
 		app.Title(b.Title),
 		app.Size(unit.Dp(b.Width), unit.Dp(b.Height)),
 	)
+	// TODO work around https://todo.sr.ht/~eliasnaur/gio/602 (still an issue in gio v0.8.0?)
+	// this should only be required shortly after creating the window w.
+	// It doesn't work with the current gio version (0.8.1-dev), which only includes a fix for os_windows.
+	applyWindowOptions := sync.OnceFunc(func() {
+		time.Sleep(50 * time.Millisecond)
+		w.Perform(system.ActionCenter | system.ActionRaise)
+	})
 	w.Perform(system.ActionCenter | system.ActionRaise)
 
 	th := material.NewTheme()
@@ -64,6 +74,7 @@ func (b *BaseDialog) Show() (confirmed bool, canceled bool, err error) {
 	for !b.done {
 		switch e := w.Event().(type) {
 		case app.FrameEvent:
+			applyWindowOptions()
 			gtx := app.NewContext(&ops, e)
 			if b.cancelButton.Clicked(gtx) {
 				b.handleCancel()
