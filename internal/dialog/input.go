@@ -3,8 +3,6 @@ package dialog
 import (
 	"image"
 	"image/color"
-	"sync"
-	"time"
 
 	"gioui.org/app"
 	"gioui.org/io/key"
@@ -143,12 +141,6 @@ func (d *inputDialog) Show() (string, bool, error) {
 		app.Title(d.Title),
 		app.Size(unit.Dp(d.Width), unit.Dp(d.Height)),
 	)
-	// TODO work around https://todo.sr.ht/~eliasnaur/gio/602 (still an issue in gio v0.8.0?)
-	// this should only be required shortly after creating the window w.
-	applyWindowOptions := sync.OnceFunc(func() {
-		time.Sleep(50 * time.Millisecond)
-		w.Perform(system.ActionCenter | system.ActionRaise)
-	})
 	w.Perform(system.ActionCenter | system.ActionRaise)
 
 	th := material.NewTheme()
@@ -157,7 +149,6 @@ func (d *inputDialog) Show() (string, bool, error) {
 	for !d.done {
 		switch e := w.Event().(type) {
 		case app.FrameEvent:
-			applyWindowOptions()
 			gtx := app.NewContext(&ops, e)
 			if d.cancelButton.Clicked(gtx) {
 				d.handleCancel()
