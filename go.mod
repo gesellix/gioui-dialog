@@ -4,7 +4,7 @@ go 1.24
 
 toolchain go1.24.6
 
-require gioui.org v0.8.1-0.20250801191533-4c0e526c0bfe
+require gioui.org v0.9.0
 
 require (
 	gioui.org/shader v1.0.8 // indirect
