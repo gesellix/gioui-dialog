@@ -2,7 +2,7 @@ module github.com/gesellix/gioui-dialog
 
 go 1.25.0
 
-require gioui.org v0.10.0
+require gioui.org v0.10.1
 
 require (
 	gioui.org/shader v1.0.8 // indirect
